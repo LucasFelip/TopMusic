@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ListFavTopMusicView: View {
-    @ObservedObject private var topMusicViewModel = TopMusicViewModel()
+    @EnvironmentObject private var topMusicViewModel: TopMusicViewModel
     
     @State private var selectedTrack: Music?
     @State private var showDetailTrack = false
@@ -59,10 +59,8 @@ struct ListFavTopMusicView: View {
                         }
                     }
                     .navigationDestination(isPresented: $showDetailTrack, destination: {
-                        if let selectedTrack = selectedTrack {
-                            DetailTopMusicView(music: selectedTrack)
-                                .navigationBarBackButtonHidden(true)
-                        }
+                        DetailTopMusicView(displayedMusic: $selectedTrack)
+                            .navigationBarBackButtonHidden(true)
                     })
                 }
                 .listStyle(PlainListStyle())

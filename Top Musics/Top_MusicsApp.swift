@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct Top_MusicsApp: App {
+    @StateObject private var topMusicViewModel = TopMusicViewModel()
+    
     var body: some Scene {
         WindowGroup {
             InitView()
+                .environmentObject(topMusicViewModel)
         }
     }
 }

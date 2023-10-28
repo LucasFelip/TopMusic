@@ -8,50 +8,62 @@
 import SwiftUI
 
 struct DetailTopMusicView: View {
-    @ObservedObject private var topMusicViewModel = TopMusicViewModel()
+    @EnvironmentObject private var topMusicViewModel: TopMusicViewModel
     
     @State private var isShowingButtonBack = true
-    @State private var isToRetorn = false
+    @State private var isToReturn = false
     
-    let music: Music
+    @Binding var displayedMusic: Music?
     
     var body: some View {
         NavigationStack {
             VStack {
                 VStack(alignment: .leading) {
-                    if let imageData = music.imagem, let uiImage = UIImage(data: imageData) {
+                    if let imageData = displayedMusic?.imagem, let uiImage = UIImage(data: imageData) {
                         Image(uiImage: uiImage)
                             .resizable()
                             .frame(width: 330, height: 330)
+                            .padding(.bottom, 5)
                     }
                     HStack {
                         VStack(alignment: .leading) {
-                            Text("\(music.nome)")
-                                .font(.headline)
-                            Text("\(music.artista)")
-                                .font(.subheadline)
+                            if let nome = displayedMusic?.nome {
+                                Text("\(nome)")
+                                    .font(.headline)
+                            }
+                            if let artista = displayedMusic?.artista {
+                                Text("\(artista)")
+                                    .font(.subheadline)
+                            }
                         }
                         Spacer()
                         VStack(alignment: .trailing) {
-                            FavoriteButton(isFavorita: music.isFavorita) {
-                                topMusicViewModel.toggleFavorite(for: music)
+                            FavoriteButton(isFavorita: displayedMusic?.isFavorita ?? false) {
+                                if let displayedMusic = displayedMusic {
+                                    topMusicViewModel.toggleFavorite(for: displayedMusic)
+                                }
                             }
                         }
                     }
-                    .padding(.bottom, 10)
+                    .padding(.bottom, 25)
                     HStack {
                         VStack(alignment: .leading) {
                             Text("Popularidade")
                                 .font(.headline)
-                            Text("\(music.popularidade)")
-                                .font(.subheadline)
+                            if let popularidade = displayedMusic?.popularidade {
+                                Text("\(popularidade)")
+                                    .font(.subheadline)
+                            }
                         }
                         Spacer()
                         VStack(alignment: .trailing) {
                             Text("Duração")
                                 .font(.headline)
-                            Text("\(music.duracaoEmMinutos)")
-                                .font(.subheadline)
+                            if let duracaoEmMinutos = displayedMusic?.duracaoEmMinutos {
+                                Text("\(duracaoEmMinutos)")
+                                    .font(.subheadline)
+                            }
+                            
                         }
                     }
                 }
@@ -60,7 +72,7 @@ struct DetailTopMusicView: View {
                 .frame(width: 330)
                 
                 ButtonRetangular(buttonText: "Abrir no Spotify", action: {
-                    if let spotifyURL = music.spotifyURL {
+                    if let spotifyURL = displayedMusic?.spotifyURL {
                         if let url = URL(string: spotifyURL.absoluteString) {
                             UIApplication.shared.open(url)
                         }
@@ -70,7 +82,7 @@ struct DetailTopMusicView: View {
             .navigationBarItems(leading: Group {
                 if isShowingButtonBack {
                     Button(action: {
-                        isToRetorn = true
+                        isToReturn = true
                     }) {
                         Image(systemName: "chevron.left")
                             .font(.title)
@@ -78,7 +90,7 @@ struct DetailTopMusicView: View {
                     }
                 }
             })
-            .navigationDestination(isPresented: $isToRetorn, destination: {
+            .navigationDestination(isPresented: $isToReturn, destination: {
                 InitView()
                     .navigationBarBackButtonHidden(true)
             })

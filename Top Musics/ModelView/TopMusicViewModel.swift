@@ -9,8 +9,9 @@ import SwiftUI
 
 class TopMusicViewModel: ObservableObject {
     @Published var topMusic: [Music] = []
-    @Published var isLoading: Bool = false
     @Published var favoriteMusic: [Music] = []
+    @Published var displayedMusic: Music?
+    @Published var isLoading: Bool = false
 
     private let persistence = PersistenceMusic.shared
     
