@@ -10,11 +10,13 @@ import Foundation
 class PersistenceMusic {
     @Published var favoriteMusic: [Music] = []
     
-    static let
+    static let shared = PersistenceMusic()
     
     func saveMusic(_ musicas: [Music]) {
         let musicasFavoritas = musicas.filter { $0.isFavorita }
         var musicasWithUpdatedPosition: [Music] = []
+        
+        print("\n\n \(musicas) \n\n")
         
         for (index, var musica) in musicasFavoritas.enumerated() {
             musica.posicaoFavorita = index + 1

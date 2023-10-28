@@ -14,8 +14,8 @@ struct TokenResponse: Codable {
 class SpotifyAuth {
     static let shared = SpotifyAuth()
     
-    private let clientID = ""
-    private let clientSecret = ""
+    private let clientID = ProcessInfo.processInfo.environment["CLIENT_ID"] ?? ""
+    private let clientSecret = ProcessInfo.processInfo.environment["CLIENT_SECRET"] ?? ""
     
     private func getAuthorizationHeader() -> String {
         let credentials = "\(clientID):\(clientSecret)"

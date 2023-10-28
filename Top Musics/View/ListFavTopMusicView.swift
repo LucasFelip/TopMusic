@@ -8,6 +8,11 @@
 import SwiftUI
 
 struct ListFavTopMusicView: View {
+    @ObservedObject private var topMusicViewModel = TopMusicViewModel()
+    
+    @State private var selectedTrack: Music?
+    @State private var showDetailTrack = false
+    
     var body: some View {
         VStack() {
             VStack() {
@@ -16,16 +21,57 @@ struct ListFavTopMusicView: View {
                 Rectangle()
                     .frame(height: 2)
                     .padding(.horizontal, 15)
-                    .cornerRadius( 10)
-            }
-            .padding(.vertical, 15)
-            ScrollView {
-                HStack {
-                    
+                    .cornerRadius(10)
                 }
+                .padding(.vertical, 15)
+            if topMusicViewModel.isLoading {
+                ProgressView("Carregando músicas...")
+                    .padding(.vertical, 200)
+            } else {
+                List(topMusicViewModel.favoriteMusic) { track in
+                    HStack {
+                        HStack {
+                            Text("\(track.posicaoFavorita)")
+                                .font(.title)
+                                .padding(.horizontal, 5)
+                            
+                            if let imageData = track.imagem, let uiImage = UIImage(data: imageData) {
+                                Image(uiImage: uiImage)
+                                    .resizable()
+                                    .frame(width: 50, height: 50)
+                                    .padding(.horizontal, 5)
+                            }
+                            
+                            VStack(alignment: .leading) {
+                                Text("\(track.nome)")
+                                    .font(.headline)
+                                Text("\(track.artista)")
+                                    .font(.subheadline)
+                            }
+                        }
+                        .onTapGesture {
+                            selectedTrack = track
+                            showDetailTrack = true
+                        }
+                        Spacer()
+                        FavoriteButton(isFavorita: track.isFavorita) {
+                            topMusicViewModel.toggleFavorite(for: track)
+                        }
+                    }
+                    .navigationDestination(isPresented: $showDetailTrack, destination: {
+                        if let selectedTrack = selectedTrack {
+                            DetailTopMusicView(music: selectedTrack)
+                                .navigationBarBackButtonHidden(true)
+                        }
+                    })
+                }
+                .listStyle(PlainListStyle())
             }
         }
         .foregroundColor(.primary)
+        .onAppear {
+            topMusicViewModel.getFavoriteTracks()
+        }
     }
 }
 
